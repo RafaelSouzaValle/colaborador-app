@@ -1,0 +1,2 @@
+ALTER TABLE Colaborador
+ADD COLUMN senha_score INT DEFAULT 0;
