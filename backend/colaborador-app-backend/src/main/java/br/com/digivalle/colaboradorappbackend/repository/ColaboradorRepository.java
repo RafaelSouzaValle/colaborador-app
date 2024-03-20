@@ -12,6 +12,11 @@ public interface ColaboradorRepository extends JpaRepository<Colaborador, Long> 
 
     @Modifying
     @Transactional
+    @Query(value = "classpath:db/migration/V1__Create_Colaborador_Table.sql", nativeQuery = true)
+    void createColaboradorTable();
+
+    @Modifying
+    @Transactional
     @Query(value = "INSERT INTO Colaborador (nome, cargo, senha, senha_score, complexidade) VALUES (:nome, :cargo, :senha, :senhaScore, :complexidade)", nativeQuery = true)
     void criarColaborador(String nome, String cargo, String senha, int senhaScore, String complexidade);
 
