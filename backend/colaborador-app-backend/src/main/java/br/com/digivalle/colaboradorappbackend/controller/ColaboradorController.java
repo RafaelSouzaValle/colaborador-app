@@ -9,6 +9,7 @@ import br.com.digivalle.colaboradorappbackend.service.ColaboradorService;
 
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/colaboradores")
 public class ColaboradorController {
