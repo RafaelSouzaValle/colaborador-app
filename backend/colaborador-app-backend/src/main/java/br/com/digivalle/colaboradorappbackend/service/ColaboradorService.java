@@ -34,12 +34,17 @@ public class ColaboradorService {
                 .orElseThrow(() -> new RuntimeException("Colaborador não encontrado com o ID: " + id));
 
         colaboradorExistente.setNome(colaborador.getNome());
+        colaboradorExistente.setCargo(colaborador.getCargo());
 
-        if (!colaboradorExistente.getSenha().equals(colaborador.getSenha())) {
-            String senhaCriptografada = passwordEncryptorService.encryptPassword(colaborador.getSenha());
-            colaboradorExistente.setSenha(senhaCriptografada);
-        }
+        String senhaCriptografada = passwordEncryptorService.encryptPassword(colaborador.getSenha());
+        colaboradorExistente.setSenha(senhaCriptografada);
 
+        // Avaliar a força da nova senha
+        String[] strength = PasswordStrengthService.evaluatePasswordStrength(colaborador.getSenha());
+        colaboradorExistente.setSenhaScore(Integer.parseInt(strength[0]));
+        colaboradorExistente.setComplexidade(strength[1].split(" - ")[0]);
+
+        // Salvar e retornar o colaborador atualizado
         return colaboradorRepository.save(colaboradorExistente);
     }
 
