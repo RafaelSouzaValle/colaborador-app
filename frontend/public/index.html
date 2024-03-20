@@ -2,39 +2,97 @@
 <html ng-app="colaboradorApp">
 <head>
     <title>Colaborador App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
     <script src="app.js"></script>
+    <style>
+        .complexidade-falha {
+            color: red;
+        }
+        .complexidade-aviso {
+            color: orange;
+        }
+        .complexidade-suficiente {
+            color: green;
+        }
+        .complexidade-excepcional {
+            color: blue;
+        }
+        .complexidade-legenda {
+            position: absolute;
+            background-color: white;
+            border: 1px solid black;
+            padding: 5px;
+            display: none;
+        }
+    </style>
 </head>
-<body ng-controller="MainController as mainCtrl">
-    <h1>Colaboradores</h1>
-    
-    <form ng-submit="mainCtrl.submit()" name="mainCtrl.form">
-        <label>Nome:</label>
-        <input type="text" ng-model="mainCtrl.colaborador.nome" required><br>
+<body ng-controller="MainController as mainCtrl" class="bg-light">
+    <div class="container py-4">
+        <h1 class="mb-4">Colaboradores</h1>
         
-        <label>Cargo:</label>
-        <select ng-model="mainCtrl.colaborador.cargo" ng-options="cargo for cargo in mainCtrl.cargos"></select><br>
-    
-        <label>Senha:</label>
-        <input type="password" ng-model="mainCtrl.colaborador.senha" ng-minlength="2" required>
-        <div ng-show="mainCtrl.form.senha.$invalid && (mainCtrl.form.senha.$touched || mainCtrl.form.$submitted)">
-            <span ng-show="mainCtrl.form.senha.$error.required">Campo obrigatório.</span>
-            <span ng-show="mainCtrl.form.senha.$error.minlength">Senha deve ter pelo menos 2 caracteres.</span>
-        </div><br>
+        <form ng-submit="mainCtrl.submit()" class="mb-4">
+            <div class="mb-3">
+                <label for="nome" class="form-label">Nome:</label>
+                <input type="text" class="form-control" id="nome" ng-model="mainCtrl.colaborador.nome" required>
+            </div>
+            
+            <div class="mb-3">
+                <label for="cargo" class="form-label">Cargo:</label>
+                <select class="form-select" id="cargo" ng-model="mainCtrl.colaborador.cargo" required>
+                    <option ng-repeat="cargo in mainCtrl.cargos" ng-value="cargo">{{ cargo }}</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha:</label>
+                <input type="password" class="form-control" id="senha" ng-model="mainCtrl.colaborador.senha" ng-change="mainCtrl.onPasswordChange()" required>
+                <div ng-if="mainCtrl.showPasswordStrength" class="mt-2">
+                    Força da senha: {{ mainCtrl.passwordStrength.strength }} - {{ mainCtrl.passwordStrength.legend }}
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">{{ mainCtrl.editMode ? 'Atualizar' : 'Salvar' }}</button>
+            <button ng-click="mainCtrl.cancelEdit()" class="btn btn-secondary" ng-show="mainCtrl.editMode">Cancelar</button>
+        </form>
         
-        <button type="submit">{{ mainCtrl.editMode ? 'Atualizar' : 'Salvar' }}</button>
-        <button ng-click="mainCtrl.cancelEdit()" ng-show="mainCtrl.editMode">Cancelar</button>
-    </form>
+        <hr class="my-4">
         
-    <hr>
-    
-    <h2>Lista de Colaboradores</h2>
-    <ul>
-        <li ng-repeat="colaborador in mainCtrl.colaboradores">
-            {{ colaborador.nome }} ({{ colaborador.cargo }}) - Score: {{ colaborador.senhaScore }}
-            <button ng-click="mainCtrl.edit(colaborador)">Editar</button>
-            <button ng-click="mainCtrl.delete(colaborador.id)">Deletar</button>
-        </li>
-    </ul>
+        <h2 class="mb-3">Lista de Colaboradores</h2>
+        <ul class="list-group">
+            <li class="list-group-item" ng-repeat="colaborador in mainCtrl.colaboradores">
+                <div class="d-flex justify-content-between align-items-center"> <!-- Movendo o contêiner d-flex para este nível -->
+                    <div>
+                        <span ng-repeat="cargo in mainCtrl.cargos">
+                            <span ng-if="$index < mainCtrl.cargos.indexOf(colaborador.cargo)">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                        </span>
+                        <strong>{{ colaborador.nome }}</strong> ({{ colaborador.cargo }}) - Score: {{ colaborador.senhaScore }} - Complexidade: 
+                        <span ng-class="{
+                            'complexidade-falha': colaborador.complexidade === 'Falha',
+                            'complexidade-aviso': colaborador.complexidade === 'Aviso',
+                            'complexidade-suficiente': colaborador.complexidade === 'Suficiente',
+                            'complexidade-excepcional': colaborador.complexidade === 'Excepcional'
+                        }"
+                        ng-mouseover="mainCtrl.showComplexidadeLegenda[$index] = true"
+                        ng-mouseleave="mainCtrl.showComplexidadeLegenda[$index] = false">
+                            {{ colaborador.complexidade }}
+                        </span>
+                        <div class="complexidade-legenda" ng-show="mainCtrl.showComplexidadeLegenda[$index]">
+                            <span ng-if="colaborador.complexidade === 'Excepcional'">Excede os padrões mínimos. Bônus adicionais são aplicados.</span>
+                            <span ng-if="colaborador.complexidade === 'Suficiente'">Atende aos padrões mínimos. Bônus adicionais são aplicados.</span>
+                            <span ng-if="colaborador.complexidade === 'Aviso'">Advertência contra o uso de práticas inadequadas. A pontuação geral é reduzida.</span>
+                            <span ng-if="colaborador.complexidade === 'Falha'">Não atende aos padrões mínimos. A pontuação geral é reduzida.</span>
+                        </div>
+                    </div>
+                    <div class="ms-auto"> <!-- Adicionando a classe ms-auto -->
+                        <button ng-click="mainCtrl.edit(colaborador)" class="btn btn-sm btn-primary me-2">Editar</button>
+                        <button ng-click="mainCtrl.delete(colaborador.id)" class="btn btn-sm btn-danger">Deletar</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>
