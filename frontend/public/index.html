@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html ng-app="colaboradorApp">
+<head>
+    <title>Colaborador App</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="app.js"></script>
+</head>
+<body ng-controller="MainController as mainCtrl">
+    <h1>Colaboradores</h1>
+    
+    <form ng-submit="mainCtrl.submit()" name="mainCtrl.form">
+        <label>Nome:</label>
+        <input type="text" ng-model="mainCtrl.colaborador.nome" required><br>
+        
+        <label>Cargo:</label>
+        <select ng-model="mainCtrl.colaborador.cargo" ng-options="cargo for cargo in mainCtrl.cargos"></select><br>
+    
+        <label>Senha:</label>
+        <input type="password" ng-model="mainCtrl.colaborador.senha" ng-minlength="2" required>
+        <div ng-show="mainCtrl.form.senha.$invalid && (mainCtrl.form.senha.$touched || mainCtrl.form.$submitted)">
+            <span ng-show="mainCtrl.form.senha.$error.required">Campo obrigatório.</span>
+            <span ng-show="mainCtrl.form.senha.$error.minlength">Senha deve ter pelo menos 2 caracteres.</span>
+        </div><br>
+        
+        <button type="submit">{{ mainCtrl.editMode ? 'Atualizar' : 'Salvar' }}</button>
+        <button ng-click="mainCtrl.cancelEdit()" ng-show="mainCtrl.editMode">Cancelar</button>
+    </form>
+        
+    <hr>
+    
+    <h2>Lista de Colaboradores</h2>
+    <ul>
+        <li ng-repeat="colaborador in mainCtrl.colaboradores">
+            {{ colaborador.nome }} ({{ colaborador.cargo }}) - Score: {{ colaborador.senhaScore }}
+            <button ng-click="mainCtrl.edit(colaborador)">Editar</button>
+            <button ng-click="mainCtrl.delete(colaborador.id)">Deletar</button>
+        </li>
+    </ul>
+</body>
+</html>
