@@ -1,8 +1,6 @@
 package br.com.digivalle.colaboradorappbackend;
 
 import br.com.digivalle.colaboradorappbackend.config.database.DatabaseMigration;
-import br.com.digivalle.colaboradorappbackend.service.PasswordStrengthService;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
